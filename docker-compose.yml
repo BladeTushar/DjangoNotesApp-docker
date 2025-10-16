@@ -1,31 +1,44 @@
+# Docker compose file
 version: "3.8"
 
-services:
+services: # tino containers ke naam jisko jisko banana hai
   nginx:
-    build: ./nginx
-    image: nginx
-    container_name: "nginx_cont"
+    build:
+      context: ./nginx #yha se image uthana hai
+    container_name: nginx
     ports:
       - "80:80"
-    restart: always
-    depends_on:
-      - django_app
     networks:
-      - notes-app-nw
+      - notes-app
+    restart: always
+    depends_on:  #yeh dependencies imp hai
+      - django
 
-  django_app:
+  mysql:
+    image: mysql #yeh sidha image se build hoga
+    ports:
+    - "3306:3306"   #if 3306 is used by anything in your system try stopping utility which is using it OR change the port ex 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: django_user
+      MYSQL_PASSWORD: django_pass
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  django:
     build:
-      context: .
-    image: django_app
-    container_name: "django_cont"
+      context: .  #image direct folder me hi rakha hai
+    container_name: django_cont    #config me diya hai nginx ke 
+    command: sh -c "sleep 15 && python manage.py migrate --no-input && gunicorn notesapp.wsgi --bind 0.0.0.0:8000"
     ports:
       - "8000:8000"
-    command: sh -c "python manage.py migrate --noinput && gunicorn notesapp.wsgi --bind 0.0.0.0:8000"
     env_file:
       - ".env"
-    depends_on:
-      - db
     restart: always
+    depends_on:
+      - mysql
+        
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/admin || exit 1"]
       interval: 10s
@@ -33,24 +46,12 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - notes-app-nw
+      - notes-app
 
-  db:
-    image: mysql
-    container_name: "db_cont"
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=test_db
-    volumes:
-      - ./data/mysql/db:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    networks:
-      - notes-app-nw
+volumes:
+  mysql-data: {}
 
 networks:
-  notes-app-nw:
+  notes-app: {}  #connected via a network
+
+#Apply it and build via docker compose up to down it use docker compose down
