@@ -9,7 +9,9 @@ Database: MySQL
 Web Server: Nginx
 
 Containerization: Docker & Docker Compose
-📁 Project Structure
+-----------------------------------------------------------
+Structure
+
 django-notes-app/
 ├── django-notes-app/          # Django project source code
 ├── nginx/                     # Nginx configuration folder
@@ -18,6 +20,7 @@ django-notes-app/
 ├── docker-compose.yml         # Multi-container configuration
 ├── requirements.txt           # Python dependencies
 └── .env                       # Environment variables
+
 
 ⚙️ Prerequisites
 
