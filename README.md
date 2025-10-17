@@ -28,9 +28,10 @@ Make sure you have the following installed:
 
 Docker
 
-Docker Compose
--------------------------------------------------------------
+
 🐳 How to Run the Project
+-------------------------------------------------------------
+
 
 Build and start all containers
 
